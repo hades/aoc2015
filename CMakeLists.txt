@@ -66,11 +66,26 @@ target_link_libraries(dec01_test PUBLIC
 )
 add_test(NAME dec01_test COMMAND dec01_test)
 
+add_library(dec02 OBJECT dec02.cc)
+target_link_libraries(dec02
+                      Boost::boost
+                      solvers
+)
+add_executable(dec02_test dec02_test.cc)
+target_link_libraries(dec02_test PUBLIC
+                      Boost::boost
+                      Boost::unit_test_framework
+                      solvers
+                      dec02
+)
+add_test(NAME dec02_test COMMAND dec02_test)
+
 add_executable(aoc15 main.cc)
 target_link_libraries(aoc15 PUBLIC
                       crash
                       requests
                       $<TARGET_OBJECTS:dec01>
+                      $<TARGET_OBJECTS:dec02>
                       cpptrace::cpptrace
                       cxxopts::cxxopts
                       spdlog::spdlog
