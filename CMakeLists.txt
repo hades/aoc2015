@@ -30,6 +30,11 @@ find_package(Zug CONFIG REQUIRED)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=c++23 -Wall -Wextra -Werror")
 
+add_library(crash STATIC crash.cc crash.h)
+target_link_libraries(crash
+                      cpptrace::cpptrace
+)
+
 add_library(requests STATIC requests.cc requests.h)
 target_link_libraries(requests
                       Boost::boost
@@ -48,6 +53,7 @@ target_link_libraries(dec01
 
 add_executable(aoc15 main.cc)
 target_link_libraries(aoc15 PUBLIC
+                      crash
                       requests
                       $<TARGET_OBJECTS:dec01>
                       cpptrace::cpptrace

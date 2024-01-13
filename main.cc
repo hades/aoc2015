@@ -11,6 +11,7 @@
 #include <zug/transducer/range.hpp>
 #include <zug/into_vector.hpp>
 
+#include "crash.h"
 #include "requests.h"
 #include "solvers.h"
 
@@ -58,12 +59,19 @@ int main(int argc, char** argv) {
       ("2,second_only", "Only run the second part of the puzzle", cxxopts::value<bool>()->default_value("false"))
       ("e,evaluate", "Evaluate the solution", cxxopts::value<bool>()->default_value("false"))
       ("r,repeats_for_timing", "Number of times to run the solution for timing", cxxopts::value<int>()->default_value("3"));
-  
+  options.add_options("hidden")
+      ("crash_handler_lifeboat_process", "Do not use: only used for signal handling");
+
   try {
     auto opts = options.parse(argc, argv);
     if (opts["debug"].as<bool>()) {
       spdlog::set_level(spdlog::level::debug);
     }
+    if (opts["crash_handler_lifeboat_process"].as<bool>()) {
+      crash_handler_lifeboat_process();
+      return 0;
+    }
+    init_crash_handler();
     int day = opts["day"].as<int>();
     std::vector<int> days = get_days_to_run(day);
     for (int day: days) {
