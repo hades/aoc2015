@@ -11,8 +11,10 @@ HunterGate(
 
 project(aoc15)
 
-hunter_add_package(Boost COMPONENTS url)
-find_package(Boost CONFIG REQUIRED url)
+include(CTest)
+
+hunter_add_package(Boost COMPONENTS test url)
+find_package(Boost CONFIG REQUIRED unit_test_framework url)
 hunter_add_package(cpptrace)
 find_package(cpptrace CONFIG REQUIRED)
 hunter_add_package(cxxopts)
@@ -44,12 +46,25 @@ target_link_libraries(requests
                       zug
 )
 
+add_library(solvers STATIC solvers.h)
+target_link_libraries(solvers
+                      cpptrace::cpptrace
+)
+
 add_library(dec01 OBJECT dec01.cc)
 target_link_libraries(dec01
                       Boost::boost
                       cpptrace::cpptrace
                       spdlog::spdlog
 )
+add_executable(dec01_test dec01_test.cc)
+target_link_libraries(dec01_test PUBLIC
+                      Boost::boost
+                      Boost::unit_test_framework
+                      solvers
+                      dec01
+)
+add_test(NAME dec01_test COMMAND dec01_test)
 
 add_executable(aoc15 main.cc)
 target_link_libraries(aoc15 PUBLIC
