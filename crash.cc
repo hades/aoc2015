@@ -15,7 +15,8 @@ void crash_handler_lifeboat_process() {
   for (;;) {
     cpptrace::safe_object_frame frame;
     std::size_t f_size = fread(&frame, sizeof(frame), 1, stdin);
-    if (f_size == 0) break;
+    if (f_size == 0)
+      break;
     if (f_size != 1) {
       std::cerr << "[LIFEBOAT] failed to read frame" << std::endl;
       std::cerr << "error: " << strerror(errno) << std::endl;
@@ -66,7 +67,7 @@ void warmup_cpptrace() {
 
 void init_crash_handler() {
   warmup_cpptrace();
-  struct sigaction action{};
+  struct sigaction action {};
   action.sa_handler = &crash_handler;
   action.sa_flags = SA_RESETHAND;
   sigemptyset(&action.sa_mask);

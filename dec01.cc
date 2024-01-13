@@ -5,6 +5,7 @@
 class day01: public solver {
   int basement_reached_on_step;
   int last_floor;
+
 public:
   void presolve(std::string input) override {
     bool been_to_basement = false;

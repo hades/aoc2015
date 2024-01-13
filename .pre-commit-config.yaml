@@ -1,0 +1,23 @@
+repos:
+-   repo: https://github.com/hades/pre-commit-hooks
+    rev: 42bc79146f8b566f640ff773057d48a9416763a7
+    hooks:
+    -   id: check-added-large-files
+    -   id: check-merge-conflict
+    -   id: check-toml
+    -   id: check-yaml
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+- repo: local
+  hooks:
+    - id: clang-format
+      name: Checking C++ code for formatting issues
+      entry: clang-format -i --style=file
+      language: system
+      types: [c++]
+    - id: pytest
+      name: Running unit tests
+      entry: poetry run pytest -q
+      language: system
+      pass_filenames: false
+      types: [python]
