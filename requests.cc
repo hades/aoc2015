@@ -9,6 +9,7 @@
 #include <boost/beast/http.hpp>
 #include <boost/beast/ssl.hpp>
 #include <boost/url/parse.hpp>
+#include <boost/url/url.hpp>
 #include <spdlog/spdlog.h>
 #include <zug/transducer/map.hpp>
 #include <zug/transducer/range.hpp>
@@ -50,8 +51,8 @@ http::response<http::string_body> execute_over_ssl(boost::asio::io_context& io_c
   return resp;
 }
 
-response get(const std::string& url, const options& opts) {
-  auto url_parse = parse_absolute_uri(url).value();
+response execute(boost::urls::url_view url_parse, const std::string& host,
+                 const http::request<http::string_body>& req) {
   std::string_view port = "443";
   bool https = true;
   if (url_parse.has_scheme() && url_parse.scheme_id() == boost::urls::scheme::http) {
@@ -63,15 +64,8 @@ response get(const std::string& url, const options& opts) {
   }
   boost::asio::io_context io_context;
   boost::asio::ip::tcp::resolver resolver(io_context);
-  const std::string host = url_parse.host();
   spdlog::debug("resolving {}", host);
   const auto lookup_results = resolver.resolve(host, port);
-  http::request<http::string_body> req{http::verb::get, url_parse.path(), 11};
-  req.set(http::field::host, host);
-  req.set(http::field::user_agent, "hades/aoc15 (https://github.com/hades/aoc15)");
-  for (const auto& header: opts.headers) {
-    req.set(header.first, header.second);
-  }
   boost::beast::flat_buffer buf;
   auto resp = https ? execute_over_ssl(io_context, buf, req, lookup_results)
                     : execute_over_tcp(io_context, buf, req, lookup_results);
@@ -79,4 +73,40 @@ response get(const std::string& url, const options& opts) {
       .text = resp.body(),
       .status_code = resp.result_int(),
   };
+}
+
+response get(const std::string& url, const options& opts) {
+  auto url_parse = parse_absolute_uri(url).value();
+  const std::string host = url_parse.host();
+  http::request<http::string_body> req{http::verb::get, url_parse.path(), 11};
+  req.set(http::field::host, host);
+  req.set(http::field::user_agent, "hades/aoc15 (https://github.com/hades/aoc15)");
+  for (const auto& header: opts.headers) {
+    req.set(header.first, header.second);
+  }
+  return execute(url_parse, host, req);
+}
+
+std::string encode_form(const std::multimap<std::string, std::string>& data) {
+  boost::urls::url u;
+  for (const auto& [key, value]: data) {
+    u.params().append({{key, value}});
+  }
+  return u.encoded_params().buffer().substr();
+}
+
+response post(const std::string& url, const options& opts, const std::multimap<std::string, std::string>& data) {
+  auto url_parse = parse_absolute_uri(url).value();
+  const std::string host = url_parse.host();
+  http::request<http::string_body> req{http::verb::post, url_parse.path(), 11};
+  req.set(http::field::host, host);
+  req.set(http::field::user_agent, "hades/aoc15 (https://github.com/hades/aoc15)");
+  for (const auto& header: opts.headers) {
+    req.set(header.first, header.second);
+  }
+  req.body() = encode_form(data);
+  req.set(http::field::content_length, std::to_string(req.body().size()));
+  req.set(http::field::content_type, "application/x-www-form-urlencoded");
+  spdlog::debug("POST body: {}", req.body());
+  return execute(url_parse, host, req);
 }

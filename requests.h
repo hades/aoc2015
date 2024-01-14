@@ -1,5 +1,5 @@
-#include <string>
 #include <map>
+#include <string>
 
 struct response {
   std::string text;
@@ -11,3 +11,5 @@ struct options {
 };
 
 response get(const std::string& url, const options& opts = {});
+response post(const std::string& url, const options& opts = {},
+              const std::multimap<std::string, std::string>& data = {});

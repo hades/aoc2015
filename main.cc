@@ -1,7 +1,9 @@
+#include <chrono>
 #include <filesystem>
 #include <format>
 #include <fstream>
 #include <sstream>
+#include <thread>
 #include <vector>
 
 #include <cpptrace/cpptrace.hpp>
@@ -49,6 +51,62 @@ std::string get_input(int day, const std::string& cookie) {
   return resp.text;
 }
 
+enum class submit_result {
+  accepted,
+  rejected_too_high,
+  rejected_too_low,
+  rejected,
+};
+
+submit_result submit(int day, int part, const std::string& answer, const std::string& cookie) {
+  std::string url = std::format("https://adventofcode.com/2015/day/{}/answer", day);
+  std::multimap<std::string, std::string> data = {
+      {"level", std::to_string(part)},
+      {"answer", answer},
+  };
+  auto resp = post(url, {.headers = {{"cookie", std::string("session=") + cookie}}}, data);
+  if (resp.status_code != 200) {
+    spdlog::debug("response from the server: {}", resp.text);
+    throw cpptrace::runtime_error(std::format("failed to submit answer: HTTP status code {}", resp.status_code));
+  }
+  if (resp.text.find("You gave an answer too recently") != std::string::npos) {
+    std::smatch match;
+    if (!std::regex_search(resp.text, match, std::regex(R"(You have (?:(\d+)m )?(\d+)s left to wait)"))) {
+      throw cpptrace::runtime_error("failed to parse remaining time to wait");
+    }
+    int seconds = std::stoi(match[2]) + 60 * (match[1].length() ? std::stoi(match[1]) : 0);
+    spdlog::info("waiting {} seconds before submitting again", seconds);
+    std::this_thread::sleep_for(std::chrono::seconds(seconds));
+    return submit(day, part, answer, cookie);
+  }
+  if (resp.text.find("That's the right answer") != std::string::npos) {
+    return submit_result::accepted;
+  } else if (resp.text.find("your answer is too high") != std::string::npos) {
+    return submit_result::rejected_too_high;
+  } else if (resp.text.find("your answer is too low") != std::string::npos) {
+    return submit_result::rejected_too_low;
+  } else {
+    return submit_result::rejected;
+  }
+}
+
+void log_result(submit_result result) {
+  switch (result) {
+  case submit_result::accepted:
+    spdlog::info("answer accepted");
+    break;
+  case submit_result::rejected_too_high:
+    spdlog::info("answer rejected: too high");
+    break;
+  case submit_result::rejected_too_low:
+    spdlog::info("answer rejected: too low");
+    break;
+  case submit_result::rejected:
+    spdlog::info("answer rejected");
+    break;
+  }
+}
+
 int main(int argc, char** argv) {
   cxxopts::Options options("aoc15", "Solver for Advent of Code 2015");
   options.add_options()("d,day", "Day to run (all days by default)", cxxopts::value<int>()->default_value("0"))(
@@ -83,10 +141,18 @@ int main(int argc, char** argv) {
         spdlog::info("solving first part of day {}", day);
         std::string first = solver->solve_first();
         spdlog::info("first part of day {}: {}", day, first);
+        if (opts["submit"].as<bool>()) {
+          spdlog::info("submitting first part of day {}", day);
+          log_result(submit(day, 1, first, opts["cookie"].as<std::string>()));
+        }
       }
       spdlog::info("solving second part of day {}", day);
       std::string second = solver->solve_second();
       spdlog::info("second part of day {}: {}", day, second);
+      if (opts["submit"].as<bool>()) {
+        spdlog::info("submitting second part of day {}", day);
+        log_result(submit(day, 2, second, opts["cookie"].as<std::string>()));
+      }
     }
   } catch (const cxxopts::OptionException& e) {
     std::cout << options.help() << std::endl;
