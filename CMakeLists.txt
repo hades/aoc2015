@@ -17,6 +17,8 @@ hunter_add_package(Boost COMPONENTS test url)
 find_package(Boost CONFIG REQUIRED unit_test_framework url)
 hunter_add_package(cpptrace)
 find_package(cpptrace CONFIG REQUIRED)
+hunter_add_package(cryptopp)
+find_package(cryptopp CONFIG REQUIRED)
 hunter_add_package(cxxopts)
 find_package(cxxopts CONFIG REQUIRED)
 hunter_add_package(OpenSSL)
@@ -56,11 +58,14 @@ target_link_libraries(aoc15 PUBLIC
                       crash
                       requests
                       cpptrace::cpptrace
+                      cryptopp-static
                       cxxopts::cxxopts
                       spdlog::spdlog
 )
 
-foreach(day RANGE 1 3)
+set(extra_link_libraries_4 cryptopp-static)
+
+foreach(day RANGE 1 4)
   if(day LESS 10)
     set(_day_formatted "dec0${day}")
   else()
@@ -78,6 +83,7 @@ foreach(day RANGE 1 3)
                         Boost::unit_test_framework
                         solvers
                         $<TARGET_OBJECTS:${_day_formatted}>
+                        ${extra_link_libraries_${day}}
   )
   add_test(NAME ${_day_formatted}_test COMMAND ${_day_formatted}_test)
   target_link_libraries(aoc15 PUBLIC $<TARGET_OBJECTS:${_day_formatted}>)
