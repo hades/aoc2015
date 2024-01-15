@@ -77,7 +77,8 @@ foreach(day RANGE 1 3)
                         Boost::boost
                         Boost::unit_test_framework
                         solvers
-                        ${_day_formatted}
+                        $<TARGET_OBJECTS:${_day_formatted}>
   )
+  add_test(NAME ${_day_formatted}_test COMMAND ${_day_formatted}_test)
   target_link_libraries(aoc15 PUBLIC $<TARGET_OBJECTS:${_day_formatted}>)
 endforeach()
