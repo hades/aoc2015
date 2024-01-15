@@ -51,57 +51,33 @@ target_link_libraries(solvers
                       cpptrace::cpptrace
 )
 
-add_library(dec01 OBJECT dec01.cc)
-target_link_libraries(dec01
-                      Boost::boost
-                      cpptrace::cpptrace
-                      spdlog::spdlog
-)
-add_executable(dec01_test dec01_test.cc)
-target_link_libraries(dec01_test PUBLIC
-                      Boost::boost
-                      Boost::unit_test_framework
-                      solvers
-                      dec01
-)
-add_test(NAME dec01_test COMMAND dec01_test)
-
-add_library(dec02 OBJECT dec02.cc)
-target_link_libraries(dec02
-                      Boost::boost
-                      solvers
-)
-add_executable(dec02_test dec02_test.cc)
-target_link_libraries(dec02_test PUBLIC
-                      Boost::boost
-                      Boost::unit_test_framework
-                      solvers
-                      dec02
-)
-add_test(NAME dec02_test COMMAND dec02_test)
-
-add_library(dec03 OBJECT dec03.cc)
-target_link_libraries(dec03
-                      Boost::boost
-                      solvers
-)
-add_executable(dec03_test dec03_test.cc)
-target_link_libraries(dec03_test PUBLIC
-                      Boost::boost
-                      Boost::unit_test_framework
-                      solvers
-                      dec03
-)
-add_test(NAME dec03_test COMMAND dec03_test)
-
 add_executable(aoc15 main.cc)
 target_link_libraries(aoc15 PUBLIC
                       crash
                       requests
-                      $<TARGET_OBJECTS:dec01>
-                      $<TARGET_OBJECTS:dec02>
-                      $<TARGET_OBJECTS:dec03>
                       cpptrace::cpptrace
                       cxxopts::cxxopts
                       spdlog::spdlog
 )
+
+foreach(day RANGE 1 3)
+  if(day LESS 10)
+    set(_day_formatted "dec0${day}")
+  else()
+    set(_day_formatted "dec${day}")
+  endif()
+  add_library(${_day_formatted} ${_day_formatted}.cc)
+  target_link_libraries(${_day_formatted} PUBLIC
+                        Boost::boost
+                        cpptrace::cpptrace
+                        spdlog::spdlog
+  )
+  add_executable(${_day_formatted}_test ${_day_formatted}_test.cc)
+  target_link_libraries(${_day_formatted}_test PUBLIC
+                        Boost::boost
+                        Boost::unit_test_framework
+                        solvers
+                        ${_day_formatted}
+  )
+  target_link_libraries(aoc15 PUBLIC $<TARGET_OBJECTS:${_day_formatted}>)
+endforeach()
