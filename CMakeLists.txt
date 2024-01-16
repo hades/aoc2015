@@ -61,6 +61,7 @@ target_link_libraries(aoc15 PUBLIC
                       cryptopp-static
                       cxxopts::cxxopts
                       spdlog::spdlog
+                      yaml-cpp
 )
 
 set(extra_link_libraries_4 cryptopp-static)
