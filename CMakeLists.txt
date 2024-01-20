@@ -66,7 +66,7 @@ target_link_libraries(aoc15 PUBLIC
 
 set(extra_link_libraries_4 cryptopp-static)
 
-foreach(day RANGE 1 7)
+foreach(day RANGE 1 8)
   if(day LESS 10)
     set(_day_formatted "dec0${day}")
   else()
