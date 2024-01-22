@@ -80,7 +80,7 @@ response get(const std::string& url, const options& opts) {
   const std::string host = url_parse.host();
   http::request<http::string_body> req{http::verb::get, url_parse.path(), 11};
   req.set(http::field::host, host);
-  req.set(http::field::user_agent, "hades/aoc15 (https://github.com/hades/aoc15)");
+  req.set(http::field::user_agent, "hades/aoc15 (https://github.com/hades/aoc2015)");
   for (const auto& header: opts.headers) {
     req.set(header.first, header.second);
   }
