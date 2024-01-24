@@ -5,16 +5,16 @@ set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/cmake/toolchain.cmake)
 include("cmake/HunterGate.cmake")
 
 HunterGate(
-    URL "https://api.github.com/repos/hades/hunter-cpp-pm/tarball/2daf2323d0dbc40ab2e36ba1e09ce5e3e7c764c1"
-    SHA1 "d1c51689c7c2cb8075cff475ac15979798f44c78"
+    URL "https://api.github.com/repos/hades/hunter-cpp-pm/tarball/4ecf814eaec65d4bfecf9b1903c4a65e433aa91d"
+    SHA1 "f09d3e1392cec9c378a7336404b99b49c26e606f"
 )
 
 project(aoc15)
 
 include(CTest)
 
-hunter_add_package(Boost COMPONENTS test url)
-find_package(Boost CONFIG REQUIRED unit_test_framework url)
+hunter_add_package(Boost COMPONENTS json test url)
+find_package(Boost CONFIG REQUIRED json unit_test_framework url)
 hunter_add_package(cpptrace)
 find_package(cpptrace CONFIG REQUIRED)
 hunter_add_package(cryptopp)
@@ -31,6 +31,8 @@ hunter_add_package(yaml-cpp)
 find_package(yaml-cpp CONFIG REQUIRED)
 hunter_add_package(Zug)
 find_package(Zug CONFIG REQUIRED)
+hunter_add_package(z3)
+find_package(Z3 CONFIG REQUIRED)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=c++23 -Wall -Wextra -Werror")
 
@@ -55,6 +57,7 @@ target_link_libraries(solvers
 
 add_executable(aoc15 main.cc)
 target_link_libraries(aoc15 PUBLIC
+                      Boost::json
                       crash
                       requests
                       cpptrace::cpptrace
@@ -62,11 +65,14 @@ target_link_libraries(aoc15 PUBLIC
                       cxxopts::cxxopts
                       spdlog::spdlog
                       yaml-cpp
+                      z3::libz3
 )
 
 set(extra_link_libraries_4 cryptopp-static)
+set(extra_link_libraries_12 Boost::json)
+set(extra_link_libraries_13 z3::libz3)
 
-foreach(day RANGE 1 11)
+foreach(day RANGE 1 13)
   if(day LESS 10)
     set(_day_formatted "dec0${day}")
   else()
