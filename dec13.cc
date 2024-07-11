@@ -7,15 +7,7 @@
 #include <z3++.h>
 
 #include "solvers.h"
-
-std::tuple<z3::sort, z3::func_decl_vector, z3::func_decl_vector> enumeration_sort(z3::context& ctx, std::string name,
-                                                                                  std::vector<std::string> values) {
-  z3::func_decl_vector consts(ctx), tests(ctx);
-  auto cvalues = values | std::views::transform([](const std::string& value) { return value.c_str(); }) |
-                 std::ranges::to<std::vector<const char*>>();
-  z3::sort sort = ctx.enumeration_sort(name.c_str(), cvalues.size(), cvalues.data(), consts, tests);
-  return {sort, consts, tests};
-}
+#include "z3_util.h"
 
 std::string solve(std::map<std::string, std::map<std::string, int>> happiness_modifiers) {
   z3::context ctx;

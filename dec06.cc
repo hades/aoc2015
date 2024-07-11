@@ -1,4 +1,3 @@
-#include <iostream>
 #include <ranges>
 #include <regex>
 #include <string>
@@ -31,7 +30,6 @@ public:
         o = op::off;
       else
         o = op::toggle;
-      std::cerr << m.str(1) << " " << m.str(2) << " " << m.str(3) << " " << m.str(4) << " " << m.str(5) << std::endl;
       this->input.emplace_back(o, std::stoi(m.str(2)), std::stoi(m.str(3)), std::stoi(m.str(4)), std::stoi(m.str(5)));
     }
   }

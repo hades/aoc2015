@@ -72,7 +72,7 @@ set(extra_link_libraries_4 cryptopp-static)
 set(extra_link_libraries_12 Boost::json)
 set(extra_link_libraries_13 z3::libz3)
 
-foreach(day RANGE 1 13)
+foreach(day RANGE 1 18)
   if(day LESS 10)
     set(_day_formatted "dec0${day}")
   else()
