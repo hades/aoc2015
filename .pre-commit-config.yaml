@@ -15,9 +15,3 @@ repos:
       entry: clang-format -i --style=file
       language: system
       types: [c++]
-    - id: pytest
-      name: Running unit tests
-      entry: poetry run pytest -q
-      language: system
-      pass_filenames: false
-      types: [python]
