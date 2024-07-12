@@ -1,3 +1,4 @@
+exclude: ^third_party/
 repos:
 -   repo: https://github.com/hades/pre-commit-hooks
     rev: 42bc79146f8b566f640ff773057d48a9416763a7
@@ -15,3 +16,8 @@ repos:
       entry: clang-format -i --style=file
       language: system
       types: [c++]
+    - id: buildifier
+      name: Checking BUILD files for formatting issues
+      entry: buildifier -lint fix
+      language: system
+      types: [bazel]
