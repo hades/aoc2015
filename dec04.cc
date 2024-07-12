@@ -5,9 +5,9 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <cpptrace/cpptrace.hpp>
-#include <cryptopp/cryptlib.h>
+#include <cryptlib.h>
 #define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
-#include <cryptopp/md5.h>
+#include <md5.h>
 
 #include "solvers.h"
 

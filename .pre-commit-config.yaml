@@ -14,6 +14,7 @@ repos:
     - id: clang-format
       name: Checking C++ code for formatting issues
       entry: clang-format -i --style=file
+      exclude: ^third_party/
       language: system
       types: [c++]
     - id: buildifier
