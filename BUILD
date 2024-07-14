@@ -403,6 +403,30 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "dec19",
+    srcs = ["dec19.cc"],
+    linkstatic = True,
+    deps = [
+        ":solvers",
+        "//third_party/boost",
+        "//third_party/cpptrace",
+        "//third_party/spdlog",
+        "@fmt",
+    ],
+    alwayslink = True,
+)
+
+cc_test(
+    name = "dec19_test",
+    srcs = ["dec19_test.cc"],
+    deps = [
+        ":dec19",
+        "//third_party/boost:boost_test",
+        "//third_party/spdlog",
+    ],
+)
+
 cc_binary(
     name = "aoc15",
     srcs = ["main.cc"],
@@ -426,6 +450,7 @@ cc_binary(
         ":dec16",
         ":dec17",
         ":dec18",
+        ":dec19",
         ":requests",
         "//third_party/cxxopts",
         "//third_party/rang",
