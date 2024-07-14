@@ -427,6 +427,27 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "dec20",
+    srcs = ["dec20.cc"],
+    linkstatic = True,
+    deps = [
+        ":solvers",
+        "//third_party/boost",
+        "//third_party/cpptrace",
+    ],
+    alwayslink = True,
+)
+
+cc_test(
+    name = "dec20_test",
+    srcs = ["dec20_test.cc"],
+    deps = [
+        ":dec20",
+        "//third_party/boost:boost_test",
+    ],
+)
+
 cc_binary(
     name = "aoc15",
     srcs = ["main.cc"],
@@ -451,6 +472,7 @@ cc_binary(
         ":dec17",
         ":dec18",
         ":dec19",
+        ":dec20",
         ":requests",
         "//third_party/cxxopts",
         "//third_party/rang",
